@@ -1,0 +1,13 @@
+# Environments
+.env
+.env.*
+!.env.example
+
+# Generated config
+config.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
