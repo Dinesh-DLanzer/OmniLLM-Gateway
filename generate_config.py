@@ -103,6 +103,22 @@ def generate_config():
             {"model_name": "bedrock/claude-sonnet-4.5", "litellm_params": {"model": "bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0", "aws_region_name": "us-east-1"}}
         )
 
+    # Manus – Custom Agent API using OpenAI format
+    if key_available('MANUS_API_KEY'):
+        models.append({
+            "model_name": "manus/agent-default",
+            "litellm_params": {
+                "model": "openai/manus",           # Provider identified as custom OpenAI
+                "api_base": "https://api.manus.ai",# Official Manus base URL[reference:2]
+                "api_key": os.environ["MANUS_API_KEY"],
+                "additional_headers": {
+                    "x-manus-api-key": os.environ["MANUS_API_KEY"]
+            },
+            "max_tokens": 8192,
+            "temperature": 0.7
+        }
+    })
+
     # Custom mapping for Claude Code (DeepSeek R1)
     if key_available('OPENROUTER_API_KEY'):
         models.append(
