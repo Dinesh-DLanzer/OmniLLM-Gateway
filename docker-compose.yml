@@ -5,14 +5,14 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: litellm
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-litellm}
+      POSTGRES_PASSWORD: litellm
       POSTGRES_DB: litellm
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - litellm_network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U litellm" ]
+      test: ["CMD-SHELL", "pg_isready -U litellm"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
     networks:
       - litellm_network
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -39,35 +39,26 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - ./config.yaml:/app/config.yaml:ro # use pre‑generated file
-      - ./.env:/app/.env:ro # if needed for env vars
+      - ./config.yaml:/app/config.yaml:ro
+      - ./.env:/app/.env:ro
     environment:
-      # Core LiteLLM settings
+      # Core settings
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-litellm-master-key}
       DATABASE_URL: postgresql://litellm:litellm@postgres:5432/litellm
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      STORE_MODEL_IN_DB: True # required for SMTP / email alerts
-
-      # ────────── API keys for all supported providers ──────────
-      BOA_API_KEY: ${BOA_API_KEY}
+      STORE_MODEL_IN_DB: False  # Use config.yaml, not database
+      
+      # API keys
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      BOA_API_KEY: ${BOA_API_KEY}
       NIM_API_KEY: ${NIM_API_KEY}
       CLOD_API_KEY: ${CLOD_API_KEY}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-us-east-1}
-
       GROQ_API_KEY: ${GROQ_API_KEY}
       CEREBRAS_API_KEY: ${CEREBRAS_API_KEY}
       COHERE_API_KEY: ${COHERE_API_KEY}
       MISTRAL_API_KEY: ${MISTRAL_API_KEY}
-      MANUS_API_KEY: ${MANUS_API_KEY}
-
-      # Langfuse (optional)
-      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
-      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY}
-      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-https://cloud.langfuse.com}
+      
     depends_on:
       postgres:
         condition: service_healthy
@@ -75,11 +66,6 @@ services:
         condition: service_healthy
     networks:
       - litellm_network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:4000/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     command:
       - "--config"
       - "/app/config.yaml"
