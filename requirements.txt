@@ -1,0 +1,5 @@
+pyyaml
+aiohttp
+aiolimiter
+tenacity
+rich
