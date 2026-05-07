@@ -3,3 +3,4 @@ aiohttp
 aiolimiter
 tenacity
 rich
+aiofiles
